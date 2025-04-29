@@ -38,7 +38,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-50">
+    <section className="flex-1 flex items-center justify-center">
       <form
         onSubmit={handleSubmit}
         className="w-full max-w-md bg-white shadow-md rounded-xl p-6 space-y-4"
@@ -79,11 +79,11 @@ export default function RegisterPage() {
 
         <button
           type="submit"
-          className="w-full bg-black text-white py-2 rounded-md hover:bg-gray-800"
+          className="w-full bg-black text-white py-2 rounded-md hover:bg-gray-800 transition duration-200 cursor-pointer"
         >
           Register
         </button>
       </form>
-    </main>
+    </section>
   );
 }

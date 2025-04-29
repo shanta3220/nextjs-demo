@@ -29,7 +29,7 @@ export default function ProfilePage() {
   }, [router]);
 
   const handleUpdate = async () => {
-    const res = await fetch("/api/userprofile", {
+    const res = await fetch("/api/profile", {
       method: "PATCH",
       body: JSON.stringify({
         newName: user.name,
@@ -57,16 +57,18 @@ export default function ProfilePage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center">
-      <div className="w-full max-w-md bg-white shadow-md rounded-xl p-6 space-y-4">
-        <h1 className="text-2xl font-semibold text-center">Profile</h1>
+    <section className="flex-grow flex items-center justify-center px-4">
+      <div className="w-full max-w-md bg-white shadow-lg rounded-2xl p-6 space-y-5">
+        <h1 className="text-2xl font-bold text-center text-gray-800">
+          Profile
+        </h1>
 
         <input
           type="text"
           value={user.name}
           onChange={(e) => setUser({ ...user, name: e.target.value })}
           placeholder="Name"
-          className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring"
+          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
 
         <input
@@ -74,13 +76,13 @@ export default function ProfilePage() {
           value={user.email}
           onChange={(e) => setUser({ ...user, email: e.target.value })}
           placeholder="Email"
-          className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring"
+          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
 
         <button
           type="button"
           onClick={handleUpdate}
-          className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700"
+          className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition cursor-pointer"
         >
           Update Profile
         </button>
@@ -88,11 +90,11 @@ export default function ProfilePage() {
         <button
           type="button"
           onClick={handleLogout}
-          className="w-full bg-red-600 text-white py-2 rounded-md hover:bg-red-700"
+          className="w-full bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition cursor-pointer"
         >
           Log Out
         </button>
       </div>
-    </main>
+    </section>
   );
 }

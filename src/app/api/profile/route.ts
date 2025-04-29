@@ -33,6 +33,7 @@ export async function PATCH(req: NextRequest) {
 
   const body = await req.json();
   const { newName, newEmail } = body;
+  console.log(session, newName, newEmail);
 
   if (!newName || !newEmail) {
     return NextResponse.json(

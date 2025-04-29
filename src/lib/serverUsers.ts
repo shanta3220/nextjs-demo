@@ -4,6 +4,11 @@ import { cookies } from "next/headers";
 import type { User } from "@/types/user";
 import { USERS_COOKIE_NAME, SESSION_COOKIE_NAME } from "@/lib/constants";
 
+export async function getUser() {
+  const user = (await cookies()).get(SESSION_COOKIE_NAME)?.value;
+  return user;
+}
+
 export async function loadUsers(): Promise<User[]> {
   const usersCookie = (await cookies()).get(USERS_COOKIE_NAME)?.value;
   if (!usersCookie) return [];
@@ -51,6 +56,7 @@ export async function updateUserEmail(
   newName: string,
   newEmail: string
 ): Promise<boolean> {
+  console.log(oldEmail, newName, newEmail);
   const users = await loadUsers();
   const user = users.find((u) => u.email === oldEmail);
   if (!user) return false;
