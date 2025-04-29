@@ -2,26 +2,25 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import type { User } from "@/types/user";
 
 export default function ProfilePage() {
   const router = useRouter();
-  const [user, setUser] = useState({ name: "", email: "" });
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<User>({ name: "", email: "" });
+  const [loading, setLoading] = useState<boolean>(true);
+  const [updating, setUpdating] = useState<boolean>(false);
 
   useEffect(() => {
     async function fetchProfile() {
-      const res = await fetch("/api/profile", {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      });
+      const res = await fetch("/api/profile");
 
       if (res.ok) {
         const data = await res.json();
         setUser({ name: data.name, email: data.email });
       } else {
-        console.error(res);
         router.push("/login");
       }
+
       setLoading(false);
     }
 
@@ -29,14 +28,14 @@ export default function ProfilePage() {
   }, [router]);
 
   const handleUpdate = async () => {
+    setUpdating(true);
     const res = await fetch("/api/profile", {
       method: "PATCH",
-      body: JSON.stringify({
-        newName: user.name,
-        newEmail: user.email,
-      }),
+      body: JSON.stringify(user),
       headers: { "Content-Type": "application/json" },
     });
+
+    setUpdating(false);
 
     if (res.ok) {
       alert("Profile updated!");
@@ -53,7 +52,11 @@ export default function ProfilePage() {
   };
 
   if (loading) {
-    return <p>Loading...</p>;
+    return (
+      <section className="flex-1 flex items-center justify-center px-4">
+        <p className="text-gray-500">Loading profile...</p>
+      </section>
+    );
   }
 
   return (
@@ -82,9 +85,14 @@ export default function ProfilePage() {
         <button
           type="button"
           onClick={handleUpdate}
-          className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition cursor-pointer"
+          disabled={updating}
+          className={`w-full py-2 rounded-md transition ${
+            updating
+              ? "bg-blue-400 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
+          } text-white`}
         >
-          Update Profile
+          {updating ? "Updating..." : "Update Profile"}
         </button>
 
         <button

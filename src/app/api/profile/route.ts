@@ -25,30 +25,28 @@ export async function GET(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  const session = (await cookies()).get(SESSION_COOKIE_NAME)?.value;
+  const oldEmail = (await cookies()).get(SESSION_COOKIE_NAME)?.value;
 
-  if (!session) {
+  if (!oldEmail) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const body = await req.json();
-  const { newName, newEmail } = body;
-  console.log(session, newName, newEmail);
-
-  if (!newName || !newEmail) {
+  const { name, email } = body;
+  if (!name || !email) {
     return NextResponse.json(
       { error: "All fields are required" },
       { status: 400 }
     );
   }
 
-  const updated = await updateUserEmail(session, newName, newEmail);
+  const updated = await updateUserEmail(oldEmail, name, email);
 
   if (!updated) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
-  await setSessionUser(newEmail);
+  await setSessionUser(email);
 
   return NextResponse.json({ success: true });
 }

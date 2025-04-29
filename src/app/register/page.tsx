@@ -2,15 +2,17 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { setSessionUser } from "@/lib/serverUsers";
+import type { RegisterFormData } from "@/types/user";
+
 export default function RegisterPage() {
   const router = useRouter();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<RegisterFormData>({
     name: "",
     email: "",
     password: "",
   });
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -23,22 +25,50 @@ export default function RegisterPage() {
     e.preventDefault();
     setError("");
 
-    const res = await fetch("/api/register", {
-      method: "POST",
-      body: JSON.stringify(formData),
-      headers: { "Content-Type": "application/json" },
-    });
+    console.log(formData);
 
-    if (res.redirected) {
-      router.push(res.url);
-    } else {
-      const data = await res.json();
-      setError(data.error || "Registration failed");
+    if (!formData.name || !formData.email || !formData.password) {
+      setError("All fields are required.");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      setError("Password must be at least 6 characters long.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/register", {
+        method: "POST",
+        body: JSON.stringify(formData),
+        headers: { "Content-Type": "application/json" },
+      });
+
+      setLoading(false);
+
+      if (res.redirected) {
+        router.push(res.url);
+      } else {
+        const data = await res.json();
+        setError(data.error || "Registration failed");
+      }
+    } catch (err) {
+      setLoading(false);
+      setError("Something went wrong. Please try again.");
+      console.error("Register error:", err);
     }
   };
 
   return (
-    <section className="flex-1 flex items-center justify-center">
+    <section className="flex-1 flex items-center justify-center px-4">
       <form
         onSubmit={handleSubmit}
         className="w-full max-w-md bg-white shadow-md rounded-xl p-6 space-y-4"
@@ -52,9 +82,10 @@ export default function RegisterPage() {
           name="name"
           value={formData.name}
           onChange={handleChange}
+          autoComplete="name"
           placeholder="Full Name"
           required
-          className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring"
+          className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
 
         <input
@@ -62,9 +93,10 @@ export default function RegisterPage() {
           name="email"
           value={formData.email}
           onChange={handleChange}
+          autoComplete="email"
           placeholder="Email"
           required
-          className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring"
+          className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
 
         <input
@@ -72,16 +104,22 @@ export default function RegisterPage() {
           name="password"
           value={formData.password}
           onChange={handleChange}
+          autoComplete="new-password"
           placeholder="Password"
           required
-          className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring"
+          className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
 
         <button
           type="submit"
-          className="w-full bg-black text-white py-2 rounded-md hover:bg-gray-800 transition duration-200 cursor-pointer"
+          disabled={loading}
+          className={`w-full text-white py-2 rounded-md transition duration-200 ${
+            loading
+              ? "bg-gray-600 cursor-not-allowed"
+              : "bg-black hover:bg-gray-800 cursor-pointer"
+          }`}
         >
-          Register
+          {loading ? "Registering..." : "Register"}
         </button>
       </form>
     </section>
